@@ -151,6 +151,7 @@ button { font: inherit; color: inherit; }
 .bk-meta { display: block; font-family: var(--latin); font-size: 13px; color: var(--muted); letter-spacing: 0.12em; margin-top: 2px; }
 .bk:focus-visible .bk-title { text-decoration: underline; text-underline-offset: 6px; }
 .shelf-name { margin-top: 18px; font-size: 14px; letter-spacing: 0.42em; padding-left: .42em; }
+.shelf-roman { font-family: var(--latin); font-size: 13px; letter-spacing: .28em; color: var(--muted); margin-top: 2px; padding-left: .28em; }
 .shelf-foot { text-align: center; color: var(--muted); font-size: 11px; padding: 0 16px 40px; letter-spacing: .1em; }
 .shelf-award {
   max-width: 520px; margin: 0 auto 56px; padding-top: 48px;
