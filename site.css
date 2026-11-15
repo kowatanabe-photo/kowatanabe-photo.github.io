@@ -151,6 +151,16 @@ button { font: inherit; color: inherit; }
 .bk-meta { display: block; font-family: var(--latin); font-size: 13px; color: var(--muted); letter-spacing: 0.12em; margin-top: 2px; }
 .bk:focus-visible .bk-title { text-decoration: underline; text-underline-offset: 6px; }
 .shelf-name { margin-top: 18px; font-size: 14px; letter-spacing: 0.42em; padding-left: .42em; }
+.shelf-roman-ja { font-family: var(--serif) !important; letter-spacing: .3em !important; font-size: 12px !important; }
+/* 言語の切り替え */
+.lang-switch {
+  font-family: var(--latin); font-size: 13px; letter-spacing: .14em; color: var(--muted);
+  padding: 8px 10px; transition: color .2s; white-space: nowrap;
+}
+.lang-switch:lang(ja) { font-family: var(--serif); font-size: 12px; }
+.lang-switch:hover, .lang-switch:focus-visible { color: var(--ink); outline: none; text-decoration: underline; text-underline-offset: 5px; }
+.shelf-nav { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
+.v-right { justify-self: end; display: flex; align-items: center; }
 .shelf-roman { font-family: var(--latin); font-size: 13px; letter-spacing: .28em; color: var(--muted); margin-top: 2px; padding-left: .28em; }
 .shelf-foot { text-align: center; color: var(--muted); font-size: 11px; padding: 0 16px 40px; letter-spacing: .1em; }
 .shelf-award {
@@ -192,6 +202,7 @@ button { font: inherit; color: inherit; }
 .v-icon:focus-visible { outline: 1px solid var(--muted); }
 .v-icon:disabled { opacity: .25; cursor: default; }
 .v-full { justify-self: end; }
+.shelf { position: relative; }
 
 .v-stage { position: relative; display: grid; place-items: center; min-height: 0; }
 .v-wrap {

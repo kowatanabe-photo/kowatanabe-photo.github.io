@@ -13,10 +13,10 @@
   let pages = [];    // {html, cls, hard, photo}
   let size = null;   // {pw, ph}
   let flipped = false;
-  if (window.matchMedia('(pointer: coarse)').matches) hint.textContent = 'タップ・スワイプでページをめくれます';
+  if (window.matchMedia('(pointer: coarse)').matches) hint.textContent = (B.ui && B.ui.hintTouch) || hint.textContent;
 
   const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const alt = (p) => esc([p.t, p.p].filter(Boolean).join(' ') || '写真');
+  const alt = (p) => esc([p.t, p.p].filter(Boolean).join(' ') || (B.ui && B.ui.photo) || '');
 
   // ---------- 画面に合わせた大きさ ----------
   function measure() {
@@ -37,7 +37,7 @@
     const cap = (p.t || p.p)
       ? `<span class="t">${esc(p.t)}</span><span>${esc(p.p)}</span>${p.n ? `<span class="ph-note">${esc(p.n)}</span>` : ''}`
       : '';
-    return `<div class="ph-page"><div class="ph-box"><img src="../${p.m}" srcset="../${p.m} ${p.mw}w, ../${p.l} ${p.w}w" sizes="${pw}px" alt="${alt(p)}" draggable="false"></div><p class="ph-cap">${cap}</p></div>`;
+    return `<div class="ph-page"><div class="ph-box"><img src="${p.m}" srcset="${p.m} ${p.mw}w, ${p.l} ${p.w}w" sizes="${pw}px" alt="${alt(p)}" draggable="false"></div><p class="ph-cap">${cap}</p></div>`;
   }
 
   function spreadHalves(p, k, pw) {
@@ -48,7 +48,7 @@
     const ox = (2 - iw) / 2;
     const oy = (k - ih) / 2;
     const style = (left) => `left:${left * 100}%;top:${(oy / k) * 100}%;width:${iw * 100}%;height:${(ih / k) * 100}%`;
-    const img = (left) => `<img class="sp-img" style="${style(left)}" src="../${p.m}" srcset="../${p.m} ${p.mw}w, ../${p.l} ${p.w}w" sizes="${Math.round(pw * iw)}px" alt="${alt(p)}" draggable="false">`;
+    const img = (left) => `<img class="sp-img" style="${style(left)}" src="${p.m}" srcset="${p.m} ${p.mw}w, ${p.l} ${p.w}w" sizes="${Math.round(pw * iw)}px" alt="${alt(p)}" draggable="false">`;
     const cap = (p.t || p.p) ? `<p class="sp-cap"><span class="t">${esc(p.t)}</span>${esc(p.p)}</p>` : '';
     return [img(ox), img(ox - 1) + cap];
   }
