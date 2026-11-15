@@ -78,10 +78,16 @@ button { font: inherit; color: inherit; }
   list-style: none; margin: 0 auto; padding: 0 clamp(16px, 5vw, 64px) clamp(80px, 14vh, 140px);
   max-width: 1240px;
   display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end;
-  gap: clamp(56px, 8vw, 96px) clamp(32px, 5vw, 72px);
+  gap: clamp(56px, 8vw, 96px) clamp(28px, 4vw, 56px);
 }
-.shelf-item { display: flex; justify-content: center; align-items: flex-end; flex: 0 1 300px; min-width: min(240px, 100%); }
+.shelf-item { display: flex; justify-content: center; align-items: flex-end; flex: 1 1 230px; max-width: 300px; min-width: min(230px, 100%); }
 .bk { display: block; width: min(100%, 300px); perspective: 1400px; outline: none; }
+/* パソコン・タブレットでは横に2冊ずつ */
+@media (min-width: 700px) {
+  .shelf-list { display: grid; grid-template-columns: repeat(2, minmax(0, 340px)); justify-content: center; column-gap: clamp(56px, 7vw, 120px); }
+  .shelf-item { max-width: none; min-width: 0; }
+  .bk { width: min(100%, 340px); }
+}
 .bk-obj {
   position: relative; display: block;
   width: 100%; aspect-ratio: 1 / var(--k);
@@ -317,3 +323,10 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .bk-obj, .bk-cover, .v-wrap { transition: none !important; }
 }
+
+/* 本棚の Instagram リンク */
+.shelf-ig { margin-top: 14px; font-family: var(--latin); font-size: 13px; letter-spacing: .12em; }
+.shelf-ig a { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); padding: 6px 10px; border-radius: 999px; transition: color .2s; }
+.shelf-ig a:hover, .shelf-ig a:focus-visible { color: var(--ink); outline: none; }
+.shelf-ig svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.shelf-ig svg .dot { fill: currentColor; stroke: none; }
