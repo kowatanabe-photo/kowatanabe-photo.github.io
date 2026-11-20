@@ -330,3 +330,13 @@ button { font: inherit; color: inherit; }
 .shelf-ig a:hover, .shelf-ig a:focus-visible { color: var(--ink); outline: none; }
 .shelf-ig svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .shelf-ig svg .dot { fill: currentColor; stroke: none; }
+
+/* 見つからないページ */
+.nf-main { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 16px; }
+.nf-main h1 { font-size: clamp(22px, 4vw, 30px); letter-spacing: .14em; margin-top: 14px; }
+.nf-en { font-family: var(--latin); color: var(--muted); letter-spacing: .14em; margin-top: 4px; }
+.nf-text { color: var(--muted); font-size: 14px; margin-top: 28px; line-height: 2; }
+.nf-links { display: flex; gap: 28px; margin-top: 32px; font-size: 14px; }
+.nf-links a { border-bottom: 1px solid var(--rule); padding-bottom: 2px; transition: border-color .2s; }
+.nf-links a:hover, .nf-links a:focus-visible { border-color: var(--ink); outline: none; }
+.nf-links a[lang="en"] { font-family: var(--latin); letter-spacing: .1em; font-size: 15px; }

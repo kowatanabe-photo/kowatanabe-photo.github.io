@@ -37,7 +37,7 @@
     const cap = (p.t || p.p)
       ? `<span class="t">${esc(p.t)}</span><span>${esc(p.p)}</span>${p.n ? `<span class="ph-note">${esc(p.n)}</span>` : ''}`
       : '';
-    return `<div class="ph-page"><div class="ph-box"><img src="${p.m}" srcset="${p.m} ${p.mw}w, ${p.l} ${p.w}w" sizes="${pw}px" alt="${alt(p)}" draggable="false"></div><p class="ph-cap">${cap}</p></div>`;
+    return `<div class="ph-page"><div class="ph-box"><img data-src="${p.m}" data-srcset="${p.m} ${p.mw}w, ${p.l} ${p.w}w" sizes="${pw}px" alt="${alt(p)}" draggable="false"></div><p class="ph-cap">${cap}</p></div>`;
   }
 
   function spreadHalves(p, k, pw) {
@@ -48,7 +48,7 @@
     const ox = (2 - iw) / 2;
     const oy = (k - ih) / 2;
     const style = (left) => `left:${left * 100}%;top:${(oy / k) * 100}%;width:${iw * 100}%;height:${(ih / k) * 100}%`;
-    const img = (left) => `<img class="sp-img" style="${style(left)}" src="${p.m}" srcset="${p.m} ${p.mw}w, ${p.l} ${p.w}w" sizes="${Math.round(pw * iw)}px" alt="${alt(p)}" draggable="false">`;
+    const img = (left) => `<img class="sp-img" style="${style(left)}" data-src="${p.m}" data-srcset="${p.m} ${p.mw}w, ${p.l} ${p.w}w" sizes="${Math.round(pw * iw)}px" alt="${alt(p)}" draggable="false">`;
     const cap = (p.t || p.p) ? `<p class="sp-cap"><span class="t">${esc(p.t)}</span>${esc(p.p)}</p>` : '';
     return [img(ox), img(ox - 1) + cap];
   }
@@ -98,8 +98,38 @@
     return P;
   }
 
+  // ---------- 写真の読み込み ----------
+  // 本を開いたときに全部を読むと遅いので、いま見ているページの近くから順に読む
+  let pageEls = [];
+  let bgTimer = null;
+  function show(img) {
+    if (!img.dataset.src) return null;
+    if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+    img.src = img.dataset.src;
+    delete img.dataset.src; delete img.dataset.srcset;
+    return img;
+  }
+  function loadNear(i) {
+    const ahead = mode === 'spread' ? 6 : 4;
+    for (let j = Math.max(0, i - 2); j <= Math.min(pageEls.length - 1, i + ahead); j++) {
+      pageEls[j].querySelectorAll('img[data-src]').forEach(show);
+    }
+  }
+  function loadRest() {
+    // 近くの写真が読めたら、残りを1枚ずつ後ろで読んでおく
+    clearTimeout(bgTimer);
+    const pending = pageEls.flatMap((el) => [...el.querySelectorAll('img[data-src]')]);
+    const busy = pageEls.some((el) => [...el.querySelectorAll('img')].some((im) => im.src && !im.complete));
+    if (!pending.length) return;
+    if (busy) { bgTimer = setTimeout(loadRest, 400); return; }
+    const img = show(pending[0]);
+    if (img) img.addEventListener('load', () => { bgTimer = setTimeout(loadRest, 50); }, { once: true });
+    if (img) img.addEventListener('error', () => { bgTimer = setTimeout(loadRest, 50); }, { once: true });
+  }
+
   // ---------- 本を作る ----------
   function build(anchorPhoto) {
+    clearTimeout(bgTimer);
     const s = measure();
     mode = s.mode;
     size = s;
@@ -140,16 +170,20 @@
       startPage: start,
       autoSize: false,
     });
-    pf.loadFromHTML(el.querySelectorAll('.page'));
-    pf.on('flip', (e) => update(e.data, true));
+    pageEls = [...el.querySelectorAll('.page')];
+    loadNear(start);
+    pf.loadFromHTML(pageEls);
+    pf.on('flip', (e) => { loadNear(e.data); update(e.data, true); });
     pf.on('changeState', (e) => {
       if (e.data === 'flipping' || e.data === 'user_fold') {
+        loadNear(pf.getCurrentPageIndex());
         if (!flipped) { flipped = true; hint.classList.add('is-hidden'); }
         if (e.data === 'user_fold') cancelReturn();
       }
     });
     update(start);
     requestAnimationFrame(() => wrap.classList.add('is-ready'));
+    bgTimer = setTimeout(loadRest, 1200);
   }
 
   // ---------- 表示の更新 ----------
@@ -272,5 +306,5 @@
   const first = measure();
   lastKey = `${first.mode}:${first.pw}:${first.ph}`;
   build(null);
-  if (m && +m[1] > 0 && +m[1] < pages.length) pf.turnToPage(+m[1]), update(+m[1]);
+  if (m && +m[1] > 0 && +m[1] < pages.length) { loadNear(+m[1]); pf.turnToPage(+m[1]); update(+m[1]); }
 })();
