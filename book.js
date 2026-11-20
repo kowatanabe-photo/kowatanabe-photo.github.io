@@ -7,6 +7,8 @@
   const bar = document.querySelector('.v-bar span');
   const hint = document.querySelector('.v-hint');
   const fullBtn = document.querySelector('.v-full');
+  const langLink = document.querySelector('.lang-switch');
+  const langBase = langLink ? langLink.getAttribute('href').split('#')[0] : '';
 
   let pf = null;
   let mode = null;   // 'spread'（見開き）か 'single'（1ページずつ）
@@ -21,8 +23,9 @@
   // ---------- 画面に合わせた大きさ ----------
   function measure() {
     const W = window.innerWidth, H = window.innerHeight;
-    const availW = W - (W < 760 ? 24 : 96);
-    const availH = H - 56 - 64 - (W < 760 ? 36 : 64);
+    const short = H <= 500; // スマホの横向きなど
+    const availW = W - (W < 760 || short ? 24 : 96);
+    const availH = short ? H - 40 - 44 - 12 : H - 56 - 64 - (W < 760 ? 36 : 64);
     const k = B.k;
     const spreadPw = Math.min(availW / 2, availH / k, 760);
     const singleK = Math.min(Math.max(availH / availW, 1.15), 1.6); // スマホは画面の縦横比に合わせる
@@ -183,6 +186,7 @@
     });
     update(start);
     requestAnimationFrame(() => wrap.classList.add('is-ready'));
+    setTimeout(() => wrap.classList.add('is-ready'), 120);
     bgTimer = setTimeout(loadRest, 1200);
   }
 
@@ -213,6 +217,7 @@
     num.textContent = label;
     bar.style.width = `${(i / last) * 100}%`;
     try { history.replaceState(null, '', `#p${i}`); } catch (_) {}
+    if (langLink) langLink.setAttribute('href', i > 0 ? `${langBase}#p${i}` : langBase);
     // 最後までめくったら、少し待って本棚へ戻る
     if (i >= last && byUser) scheduleReturn(); else cancelReturn();
   }
@@ -299,6 +304,14 @@
       lastKey = key;
       build(currentPhoto());
     }, 250);
+  });
+
+  window.addEventListener('hashchange', () => {
+    const h = location.hash.match(/^#p(\d+)$/);
+    if (!pf || !h) return;
+    const n = Math.min(+h[1], pages.length - 1);
+    if (n === pf.getCurrentPageIndex()) return;
+    loadNear(n); pf.turnToPage(n); update(n);
   });
 
   // 最初の表示（URL の #p番号 からも再開できる）
